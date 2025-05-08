@@ -1,11 +1,9 @@
 #' this file will summarize the cpm data frame by separating out the tRNA reference name and summing the reads together where 'uncharged' was included in the refereence file name.
-#' @return two data frames. one cleaned but isodecoder species are still present. One cleaned and summarized containing isodecoders only
+#' @param cpm_df Counts per million dataframe from import_df()
+#' @return clean tRNA reference names and summarize redundant names
 #' @export
 clean_cpm_df <- function(cpm_df){
-  library(fs)
   library(tidyverse)
-  library(here)
-  library(janitor)
 
   cleaned_cpm_df <- cpm_df |> 
       # separate reference and drop "uncharged" label
@@ -28,7 +26,9 @@ clean_cpm_df <- function(cpm_df){
   
   return(cleaned_cpm_df)
 }
-      
+#' @param cleaned_cpm_df counts per million df with cleaned reference names
+#' @return a dataframe with isodecoder count per million means (average tRNA species)
+#' @export
 isodecoder_means <- function(cleaned_cpm_df){
   # get mean cpm and chrg for each isodecoder
   iso_means <- cleaned_cpm_df |> 
