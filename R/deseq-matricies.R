@@ -1,4 +1,9 @@
-
+#'this file runs DESEQ2 analysis
+#' @param clean_cpm_df count per million dataframe with cleaned reference names
+#' @param organism either host or phage. filters relevant colummns to generate single organism dataframe
+#' @param metric either total_counts (abunance) or pct_charged (charging) (or just charged reads?)
+#' @return generate count matrix from clean_cpm_df
+#' @export
 count_matrix <- function(clean_cpm_df, organism, metric) {
   
   # Ensure valid organism
@@ -38,9 +43,10 @@ count_matrix <- function(clean_cpm_df, organism, metric) {
 
   return(count_matrix)
 }
-
-
-abundance_coldata <- function(count_matrix){
+#' @param count_matrix use count matrix to generate metadata
+#' @return metadata dataframe
+#' @export
+coldata <- function(count_matrix){
   # Extract metadata from the column names
   sample_names <- colnames(count_matrix)
   metadata <- data.frame(
@@ -62,7 +68,11 @@ abundance_coldata <- function(count_matrix){
   return(metadata)
 
 }
-
+#' @param count_matrix count matrix
+#' @param coldata metadata
+#' @param design_formula statistical formula 
+#' @return dds dataframe containing differencial expression results
+#' @export
 run_deseq <- function(count_matrix, coldata, design_formula, min_count = 10) {
   dds <- DESeqDataSetFromMatrix(
     countData = count_matrix,
@@ -74,6 +84,11 @@ run_deseq <- function(count_matrix, coldata, design_formula, min_count = 10) {
   return(dds)
 }
 
+#' @param dds dds dataframe
+#' @param coef_name name of coefficient 
+#' @param padj_cutoff 0.05 by default
+#' @return results dataframe
+#' @export
 get_deseq_results <- function(dds, coef_name, padj_cutoff = 0.05) {
   res <- results(dds, name = coef_name)
   sig_res <- subset(res, padj < padj_cutoff)
@@ -84,6 +99,10 @@ get_deseq_results <- function(dds, coef_name, padj_cutoff = 0.05) {
   ))
 }
 
+#' @param res_object results from get_res_results
+#' @param title title of volcano plot
+#' @return volcano plot object
+#' @export
 vol_plot <- function (res_object, title, pCutoff = 0.05, FCcutoff = 0.5){
   # Convert results to data frames for visualization
   # Create a data frame with rownames converted to a column
